@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace SanctionScanner.Models
 {
-    public class Sanction:BaseEntity
+    public class SanctionModel
     {
-        public string RefrenceId { get; set; }
         public string LegalName { get; set; }
         public string EntityType { get; set; }
         public string NameType { get; set; }
@@ -26,9 +24,5 @@ namespace SanctionScanner.Models
         public string CountryRelated { get; set; }
         public int MatchNumber { get; set; }
         public Guid SactionUID { get; set; }
-        public int SourceSaction_Id { get; set; }
-        [ForeignKey("SourceSaction_Id")]
-        public SourceSanction  SourceSanction { get; set; }
-
     }
 }

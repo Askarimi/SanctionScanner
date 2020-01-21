@@ -1,0 +1,67 @@
+﻿@model SanctionScanner.Models.SourceSanctionModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>SourceSanctionModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="SourceName" class="control-label"></label>
+                <input asp-for="SourceName" class="form-control" />
+                <span asp-validation-for="SourceName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SourceCode" class="control-label"></label>
+                <input asp-for="SourceCode" class="form-control" />
+                <span asp-validation-for="SourceCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NameFile" class="control-label"></label>
+                <input asp-for="NameFile" class="form-control" />
+                <span asp-validation-for="NameFile" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FormatFile" class="control-label"></label>
+                <input asp-for="FormatFile" class="form-control" />
+                <span asp-validation-for="FormatFile" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="custom-file">
+                    <input asp-for="FormFile" type="file" name="FormFile" class="form-control custom-file-input" />
+                    <label class="custom-file-label">Plase Choise File....</label>
+                </div>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="HasFile" /> @Html.DisplayNameFor(model => model.HasFile)
+                </label>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script>
+    $(document).ready(function () {
+        $('.custom-file-input').on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).next(".custom-file-label").html(fileName);
+        });
+    });
+</script>
+}

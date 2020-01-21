@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace SanctionScanner.Models
 {
-    public class SourceSanction : BaseEntity
+    public class SourceSanctionModel
     {
-        public SourceSanction()
+
+        public SourceSanctionModel()
         {
             Sanctions = new HashSet<Sanction>();
         }
@@ -17,7 +18,7 @@ namespace SanctionScanner.Models
         public string NameFile { get; set; }
         public string FormatFile { get; set; }
         public bool HasFile { get; set; }
-       //public IFormFile  FormFile { get; set; }
+        public IFormFile  FormFile { get; set; }
         public virtual ICollection<Sanction> Sanctions { get; set; }
     }
 }
