@@ -26,6 +26,7 @@ namespace SanctionScanner
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddRazorPages();
             services.AddDbContext<SanctionScannerDbContext>(option => option.UseSqlServer(Configuration.GetConnectionString("DefualtConnection")));
         }
 
@@ -54,6 +55,8 @@ namespace SanctionScanner
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllers();
+                endpoints.MapRazorPages();
             });
         }
     }

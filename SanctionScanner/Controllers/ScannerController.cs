@@ -46,52 +46,12 @@ namespace SanctionScanner.Controllers
             if (ModelState.IsValid)
             {
 
-                if (!Path.GetExtension(model.FormFile.FileName).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
-                {
-                    ViewBag.ErrorMessage = "Not Support file extension";
-                    return View("Index");
-                }
-
                 SourceSanction sourceSanction = new SourceSanction();
                 sourceSanction.FormatFile = model.FormatFile;
                 sourceSanction.HasFile = model.HasFile;
                 model.NameFile = model.NameFile;
                 sourceSanction.SourceName = model.SourceName;
-                var sanctions = new List<Sanction>();
-                using (var stream = new MemoryStream())
-                {
-                    string importFolder = Path.Combine(_hostingEnvironment.WebRootPath, "ImportFiles");
-                    string filePath = Path.Combine(importFolder, model.FormFile.FileName);
-                    await model.FormFile.CopyToAsync(stream);
-                    using (var package = new ExcelPackage(stream))
-                    {
-                        ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
-                        var rowCount = worksheet.Dimension.Rows;
 
-                        for (int row = 2; row <= rowCount; row++)
-                        {
-                         
-                            sourceSanction.Sanctions.Add(new Sanction
-                            {
-                                RefrenceId = worksheet.Cells[row, 1].Value.ToString().Trim(),
-                                LegalName = worksheet.Cells[row, 2].Value.ToString().Trim(),
-                                EntityType = worksheet.Cells[row, 3].Value.ToString().Trim(),
-                                NameType = worksheet.Cells[row, 4].Value.ToString().Trim(),
-                                DateofBirth = worksheet.Cells[row, 5].Value.ToString().Trim(),
-                                PlaceofBirth = worksheet.Cells[row, 6].Value.ToString().Trim(), 
-                                Citizenship = worksheet.Cells[row, 7].Value.ToString().Trim(), 
-                                Address = worksheet.Cells[row, 8].Value.ToString().Trim(), 
-                                AdditionalInformation = worksheet.Cells[row, 9].Value.ToString().Trim(),
-                                ListingInformation = worksheet.Cells[row, 10].Value.ToString().Trim(),
-                                Committees = worksheet.Cells[row, 11].Value.ToString().Trim(),
-                                ControlDate = worksheet.Cells[row, 12].Value.ToString().Trim(),
-                                InsertDate = DateTime.UtcNow.Date.ToString(),
-                                IsActive = Convert.ToByte(1),
-                                SactionUID = Guid.NewGuid()
-                            });
-                        }
-                    }
-                }  
                 //if (model.FormFile != null)
                 //{
                 //    string importFolder = Path.Combine(_hostingEnvironment.WebRootPath, "ImportFiles");
@@ -122,6 +82,107 @@ namespace SanctionScanner.Controllers
                 _context.SourceSanctions.Add(sourceSanction);
                 await _context.SaveChangesAsync();
                 //return RedirectToAction("Index");
+            }
+            return View(model);
+        }
+
+        public IActionResult Edit(int id)
+        {
+            var sourceSanction = _context.SourceSanctions.FindAsync(id).Result;
+            if (sourceSanction == null)
+            {
+                return NotFound();
+            }
+            SourceSanction model = new SourceSanction();
+            model.Id = sourceSanction.Id;
+            model.HasFile = sourceSanction.HasFile;
+            model.NameFile = sourceSanction.NameFile;
+            model.SourceName = sourceSanction.SourceName;
+            model.SourceCode = sourceSanction.SourceCode;
+            return View(model);
+        }
+        [HttpPost()]
+        public async Task<IActionResult> Edit(int id, SourceSanction model, IFormFile file)
+        {
+            if (model == null)
+            {
+                return NotFound();
+            }
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    if (!Path.GetExtension(file.FileName).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ViewBag.ErrorMessage = "Not Support file extension";
+                        return View("Index");
+                    }
+                    var sanctions = new List<Sanction>();
+                    SourceSanction sourceSanction = new SourceSanction();
+                    sourceSanction.Id = id;
+                    sourceSanction.FormatFile = model.FormatFile;
+                    sourceSanction.HasFile = model.HasFile;
+                    sourceSanction.NameFile = model.NameFile;
+                    sourceSanction.SourceCode = model.SourceCode;
+                    sourceSanction.SourceName = model.SourceName;
+                    using (var stream = new MemoryStream())
+                    {
+                        string importFolder = Path.Combine(_hostingEnvironment.WebRootPath, "ImportFiles");
+                        string filePath = Path.Combine(importFolder, file.FileName);
+                        await file.CopyToAsync(stream);
+                        using (var package = new ExcelPackage(stream))
+                        {
+                            ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                            var rowCount = worksheet.Dimension.Rows;
+                            var counterRecord = 0;
+                            for (int row = 2; row <= rowCount; row++)
+                            {
+                                if (!CheckHasRecord(id, worksheet.Cells[row, 1].Value.ToString().Trim()))
+                                {
+                                    model.Sanctions.Add(new Sanction
+                                    {
+                                        RefrenceId = worksheet.Cells[row, 1].Value == null ? "" : worksheet.Cells[row, 1].Value.ToString().Trim(),
+                                        LegalName = worksheet.Cells[row, 2].Value == null ? "" : worksheet.Cells[row, 2].Value.ToString().Trim(),
+                                        EntityType = worksheet.Cells[row, 3].Value == null ? "" : worksheet.Cells[row, 3].Value.ToString().Trim(),
+                                        NameType = worksheet.Cells[row, 4].Value == null ? "" : worksheet.Cells[row, 4].Value.ToString().Trim(),
+                                        DateofBirth = worksheet.Cells[row, 5].Value == null ? "" :  worksheet.Cells[row, 5].Value.ToString().Trim(),
+                                        PlaceofBirth = worksheet.Cells[row, 6].Value == null ? "" :  worksheet.Cells[row, 6].Value.ToString().Trim(),
+                                        Citizenship = worksheet.Cells[row, 7].Value == null ? "" : worksheet.Cells[row, 7].Value.ToString().Trim(),
+                                        Address = worksheet.Cells[row, 8].Value == null ? "" : worksheet.Cells[row, 8].Value.ToString().Trim(),
+                                        AdditionalInformation = worksheet.Cells[row, 9].Value == null ? "" : worksheet.Cells[row, 9].Value.ToString().Trim(),
+                                        ListingInformation = worksheet.Cells[row, 10].Value == null ? "" : worksheet.Cells[row, 10].Value.ToString().Trim(),
+                                        Committees = worksheet.Cells[row, 11].Value == null ? "" : worksheet.Cells[row, 11].Value.ToString().Trim(),
+                                        ControlDate = worksheet.Cells[row, 12].Value == null ? "" : worksheet.Cells[row, 12].Value.ToString().Trim(),
+                                        InsertDate = DateTime.UtcNow.Date.ToString(),
+                                        IsActive = Convert.ToByte(1),
+                                        SactionUID = Guid.NewGuid()
+                                    });
+                                }
+                                if (counterRecord == 10)
+                                {
+                                    sourceSanction.Sanctions = model.Sanctions;
+                                    _context.Update(sourceSanction);
+                                    await _context.SaveChangesAsync();
+                                    counterRecord = 0;
+                                }
+                                else
+                                    counterRecord++;
+                            }
+                        }
+                    }
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    if (!SourceSanctionExists(model.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
             }
             return View(model);
         }
@@ -223,6 +284,17 @@ namespace SanctionScanner.Controllers
 
                 throw;
             }
+        }
+        private bool SourceSanctionExists(int id)
+        {
+            return _context.SourceSanctions.Any(e => e.Id == id);
+        }
+        private bool CheckHasRecord(int id, string refrenceId)
+        {
+            //var findSource = _context.Sanctions.FirstOrDefault(c => c.SourceSaction_Id == id && c.RefrenceId.Equals(refrenceId));
+            //if (findSource == null)
+            //    return false;
+            return _context.Sanctions.Any(c => c.SourceSaction_Id == id && c.RefrenceId.Equals(refrenceId));
         }
     }
 }

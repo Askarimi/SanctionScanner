@@ -1,17 +1,18 @@
-﻿@model SanctionScanner.Models.SourceSanctionModel
+﻿@model SanctionScanner.Models.SourceSanction
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Edit";
 }
 
-<h1>Create</h1>
+<h1>Edit</h1>
 
 <h4>SourceSanctionModel</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create" enctype="multipart/form-data">
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
             <div class="form-group">
                 <label asp-for="SourceName" class="control-label"></label>
                 <input asp-for="SourceName" class="form-control" />
@@ -31,14 +32,20 @@
                 <label asp-for="FormatFile" class="control-label"></label>
                 <input asp-for="FormatFile" class="form-control" />
                 <span asp-validation-for="FormatFile" class="text-danger"></span>
-            </div>           
+            </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="HasFile" /> @Html.DisplayNameFor(model => model.HasFile)
                 </label>
             </div>
+            @*<div class="form-group">
+                <div class="custom-file">
+                    <input type="file" name="file" class="form-control custom-file-input" />
+                    <label class="custom-file-label">Plase Choise File....</label>
+                </div>
+            </div>*@
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
     </div>
@@ -50,5 +57,4 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-
 }
