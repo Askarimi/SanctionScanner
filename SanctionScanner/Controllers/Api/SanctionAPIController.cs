@@ -35,15 +35,33 @@ namespace SanctionScanner.Controllers.Api
             sourceSanction.Sanctions = _context.Sanctions.Where(c => c.SourceSaction_Id == id).Skip(10).ToList();
             return sourceSanction;
         }
-        [HttpGet("{sourceId}/{Citizenship}")]
-        public async Task<ActionResult<Sanction>> GetSanctions(int sourceId, string citizenship)
+        [HttpGet("{id}/{fullName}")]
+        public async Task<ActionResult<Sanction>> GetSanctionByName(int id, string fullName)
         {
+            try
+            {
+                var sanctions = _context.Sanctions.Where(c => c.SourceSaction_Id == id && c.LegalName.Contains(fullName)).ToList();
+                if (sanctions == null || sanctions.Count() == 0)
+                    return NotFound($"Not Result Match For {fullName}");
+                return Ok(sanctions);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        [HttpGet("{sourceId}/{Citizenship}")]
+        public async Task<ActionResult<Sanction>> GetSanctionsByCitizenship(int sourceId, string citizenship)
+        {
+            var errorMessage = "Please Enter CountryId";
+            if (sourceId == 0)
+                return NotFound(errorMessage);
             var sanctions = _context.Sanctions.Where(c => c.SourceSaction_Id == sourceId && c.Citizenship.Contains(citizenship)).ToList();
             if (sanctions == null)
                 return NotFound();
             return Ok(sanctions);
         }
-
+        [HttpGet("{id}/{}")]
         //// GET api/<controller>/5
         //[HttpGet("{id}")]
         //public string Get(int id)
