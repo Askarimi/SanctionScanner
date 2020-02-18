@@ -61,7 +61,7 @@ namespace SanctionScanner.Controllers.Api
                 return NotFound();
             return Ok(sanctions);
         }
-        [HttpGet("{id}/{}")]
+        //[HttpGet("{id}/{}")]
         //// GET api/<controller>/5
         //[HttpGet("{id}")]
         //public string Get(int id)
